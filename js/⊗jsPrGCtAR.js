@@ -203,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const submintBtn = document.querySelector(".submitBtn");
   const gameHistory = document.querySelector(".game-history");
   const currentLetterElement = document.querySelector(".current-letter");
+  let finishBtn = document.querySelector(".finishBtn");
 
   // Игровые переменные
   let usedCities = [];
@@ -253,7 +254,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const robotCity = possibleCities[randomIndex];
 
     // Добавить город в использованные
-    usedCities.push(robotCity);
+    usedCities.push({
+      player: "robot",
+      city: robotCity,
+    });
 
     // Определение следующей буквы
     currentLetter = getLastLetter(robotCity);
@@ -289,7 +293,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!gameStarted) {
       // Проверка имеющего города в списке
       gameStarted = true;
-      usedCities.push(userCity);
+
+      usedCities.push({
+        player: "user",
+        city: userCity,
+      });
+
       currentLetter = getLastLetter(userCity);
 
       addMessage(
@@ -322,7 +331,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Добавить город в использованные
-    usedCities.push(userCity);
+    usedCities.push({
+      player: "user",
+      city: userCity,
+    });
+
+    // console.log(usedCities);
 
     // Определение следующей буквы
     currentLetter = getLastLetter(userCity);
@@ -332,6 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `Вы: ${cities[normalizedCities.indexOf(userCity)]}`,
       "user-message"
     );
+
     currentLetterElement.textContent = `Текущая буква: ${currentLetter.toUpperCase()}`;
 
     // Чистка поле ввода
@@ -341,6 +356,24 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(robotTurn, 1000);
   }
 
+  // Завершение игры
+  function handleFinshGame() {
+    addMessage("Игра окончена!", "info-message");
+
+    const robotCities = usedCities.filter((item) => item.player === "robot");
+    const userCities = usedCities.filter((item) => item.player === "user");
+
+    // console.log(usedCities);
+
+    addMessage(
+      `Вы назвали ${userCities.length} городов. Робот назвал ${robotCities.length} городов.`, "error-message"
+    );
+
+    submintBtn.disabled = true;
+    cityInput.disabled = true;
+    finishBtn.disabled = true;
+  }
+
   //  Обработчик событий
   submintBtn.addEventListener("click", handleCitySubmit);
   cityInput.addEventListener("keypress", function (e) {
@@ -348,6 +381,8 @@ document.addEventListener("DOMContentLoaded", () => {
       handleCitySubmit();
     }
   });
+
+  finishBtn.addEventListener("click", handleFinshGame);
 
   // Начальное сообщение
   addMessage("Начните игру! Введите любой город России", "info-message");
